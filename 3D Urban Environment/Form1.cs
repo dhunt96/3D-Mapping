@@ -143,6 +143,7 @@ namespace _3D_Urban_Environment
             System.Collections.ArrayList Buildings;
             double da;
             double a;
+            double ScaleValue = .5;
 
         
 
@@ -447,7 +448,7 @@ namespace _3D_Urban_Environment
 
                 E = new Vector(x, y, 50);
                 V = Add(new Vector(0, 0, 0), Scale(E, -1));
-                V = Scale(V, 0.5);
+                V = Scale(V, ScaleValue);
                 Vector N = new Vector(0, 0, 1);
 
                 CartesianXAxis = Cross(V, N);
@@ -485,14 +486,14 @@ namespace _3D_Urban_Environment
 
             private void RightKey()
             {
-                listBox1.Items.Add("RIGHT");
+                //DEBUG listBox1.Items.Add("RIGHT");
                 a += da;
                 double x = 100 * Math.Cos(a);
                 double y = 100 * Math.Sin(a);
 
                 E = new Vector(x, y, 50);
                 V = Add(new Vector(0, 0, 0), Scale(E, -1));
-                V = Scale(V, 0.5);
+                V = Scale(V, ScaleValue);
                 Vector N = new Vector(0, 0, 1);
 
                 CartesianXAxis = Cross(V, N);
@@ -512,14 +513,14 @@ namespace _3D_Urban_Environment
 
             private void LeftKey()
             {
-                listBox1.Items.Add("LEFT");
+                //DEBUG listBox1.Items.Add("LEFT");
                 a -= da;
                 double x = 100 * Math.Cos(a);
                 double y = 100 * Math.Sin(a);
 
                 E = new Vector(x, y, 50);
                 V = Add(new Vector(0, 0, 0), Scale(E, -1));
-                V = Scale(V, 0.5);
+                V = Scale(V, ScaleValue);
                 Vector N = new Vector(0, 0, 1);
 
                 CartesianXAxis = Cross(V, N);
@@ -570,6 +571,18 @@ namespace _3D_Urban_Environment
             {
                 RightKey();
                 return true;
+            }
+
+            if(keyData == Keys.Up)
+            {
+                ScaleValue += .01;
+                draw();
+            }
+
+            if(keyData == Keys.Down)
+            {
+                ScaleValue -= .01;
+                draw();
             }
             return base.ProcessCmdKey(ref msg, keyData);
         }
