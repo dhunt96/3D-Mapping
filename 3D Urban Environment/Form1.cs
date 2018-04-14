@@ -12,51 +12,43 @@ namespace _3D_Urban_Environment
 {
     public partial class Form1 : Form
     {
-       
-
-     
-
-            public class Vector
+        public class Vector
+        {
+            double x;
+            double y;
+            double z;
+            public Vector(double X, double Y, double Z)
             {
-                double x;
-                double y;
-                double z;
-                public Vector(double X, double Y, double Z)
-                {
-                    x = X;
-                    y = Y;
-                    z = Z;
-                }
-                public Vector()
-                {
-                    x = 0;
-                    y = 0;
-                    z = 0;
-                }
-                public double X
-                {
-                    get { return x; }
-                    set { x = value; }
-                }
-                public double Y
-                {
-                    get { return y; }
-                    set { y = value; }
-                }
-                public double Z
-                {
-                    get { return z; }
-                    set { z = value; }
-                }
-                public override string ToString()
-                {
-                    return "<" + x.ToString("f3") + "," + y.ToString("f3") + "," + z.ToString("f3") + ">";
-                }
+                x = X;
+                y = Y;
+                z = Z;
             }
-
-
-
-
+            public Vector()
+            {
+                x = 0;
+                y = 0;
+                z = 0;
+            }
+            public double X
+            {
+                get { return x; }
+                set { x = value; }
+            }
+            public double Y
+            {
+                get { return y; }
+                set { y = value; }
+            }
+            public double Z
+            {
+                get { return z; }
+                set { z = value; }
+            }
+            public override string ToString()
+            {
+                return "<" + x.ToString("f3") + "," + y.ToString("f3") + "," + z.ToString("f3") + ">";
+            }
+        }
 
             public class Edge
             {
@@ -158,7 +150,8 @@ namespace _3D_Urban_Environment
             {
                 InitializeComponent();
 
-                Edges = new System.Collections.ArrayList();
+            Edges = new System.Collections.ArrayList();
+
                 Buildings = new System.Collections.ArrayList();
 
 
@@ -207,7 +200,7 @@ namespace _3D_Urban_Environment
                 //RenderView();
                 da = 0.005;
                 a = -1 * Math.PI / 2;
-                timer1.Enabled = true;
+            timer1.Enabled = true;
 
             }
 
@@ -448,7 +441,7 @@ namespace _3D_Urban_Environment
 
             private void timer1_Tick(object sender, EventArgs e)
             {
-                a += da;
+                //a += da;
                 double x = 100 * Math.Cos(a);
                 double y = 100 * Math.Sin(a);
 
@@ -470,25 +463,12 @@ namespace _3D_Urban_Environment
                 label2.Text = "Eye = " + E.ToString();
                 label3.Text = "View = " + V.ToString();
 
-                // Draw background
-                Bitmap View = new Bitmap(pictureBox1.Width, pictureBox1.Height);
-                Graphics g = Graphics.FromImage(View);
-                g.FillRectangle(new SolidBrush(Color.Black), 0, 0, View.Width, View.Height);
-
-                // Draw buildings
-                foreach (Edge edge in Edges)
-                {
-                    PointF V1 = Project(edge.Vertex1);
-                    PointF V2 = Project(edge.Vertex2);
-                    g.DrawLine(new Pen(edge.Color), V1.X, V1.Y, V2.X, V2.Y);
-                }
-
-                // Display View
-                pictureBox1.Image = View;
+                draw();
                 //timer1.Enabled = false; // DEBUG
             }
 
 
+            //private void picturBox1_LeftArrow(object sender, )
 
             private void pictureBox1_MouseDown(object sender, MouseEventArgs e)
             {
@@ -502,7 +482,98 @@ namespace _3D_Urban_Environment
             {
 
             }
+
+            private void RightKey()
+            {
+                listBox1.Items.Add("RIGHT");
+                a += da;
+                double x = 100 * Math.Cos(a);
+                double y = 100 * Math.Sin(a);
+
+                E = new Vector(x, y, 50);
+                V = Add(new Vector(0, 0, 0), Scale(E, -1));
+                V = Scale(V, 0.5);
+                Vector N = new Vector(0, 0, 1);
+
+                CartesianXAxis = Cross(V, N);
+                CartesianXAxis = Normalize(CartesianXAxis);
+                CartesianXAxis = Scale(CartesianXAxis, 5);
+
+                CartesianYAxis = Cross(CartesianXAxis, V);
+                CartesianYAxis = Normalize(CartesianYAxis);
+                CartesianYAxis = Scale(CartesianYAxis, 4);
+
+                CenterCartesianPoint = Add(E, V);
+
+                label2.Text = "Eye = " + E.ToString();
+                label3.Text = "View = " + V.ToString();
+            draw();
+            }
+
+            private void LeftKey()
+            {
+                listBox1.Items.Add("LEFT");
+                a -= da;
+                double x = 100 * Math.Cos(a);
+                double y = 100 * Math.Sin(a);
+
+                E = new Vector(x, y, 50);
+                V = Add(new Vector(0, 0, 0), Scale(E, -1));
+                V = Scale(V, 0.5);
+                Vector N = new Vector(0, 0, 1);
+
+                CartesianXAxis = Cross(V, N);
+                CartesianXAxis = Normalize(CartesianXAxis);
+                CartesianXAxis = Scale(CartesianXAxis, 5);
+
+                CartesianYAxis = Cross(CartesianXAxis, V);
+                CartesianYAxis = Normalize(CartesianYAxis);
+                CartesianYAxis = Scale(CartesianYAxis, 4);
+
+                CenterCartesianPoint = Add(E, V);
+
+                label2.Text = "Eye = " + E.ToString();
+                label3.Text = "View = " + V.ToString();
+            draw();
+            }
+
+            private void draw()
+        { 
+            // Draw background
+            Bitmap View = new Bitmap(pictureBox1.Width, pictureBox1.Height);
+            Graphics g = Graphics.FromImage(View);
+            g.FillRectangle(new SolidBrush(Color.Black), 0, 0, View.Width, View.Height);
+
+            // Draw buildings
+            foreach (Edge edge in Edges)
+            {
+                PointF V1 = Project(edge.Vertex1);
+                PointF V2 = Project(edge.Vertex2);
+                g.DrawLine(new Pen(edge.Color), V1.X, V1.Y, V2.X, V2.Y);
+            }
+
+            // Display View
+            pictureBox1.Image = View;
+            //timer1.Enabled = false; // DEBUG
         }
+
+        protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+        {
+            //capture up arrow key
+            if (keyData == Keys.Left)
+            {
+                LeftKey();
+                return true;
+            }
+
+            if(keyData == Keys.Right)
+            {
+                RightKey();
+                return true;
+            }
+            return base.ProcessCmdKey(ref msg, keyData);
+        }
+    }
     }
 
 
