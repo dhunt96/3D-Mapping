@@ -85,6 +85,40 @@ namespace _3D_Urban_Environment
 
         }
 
+        public class CarEdge
+        {
+            Vector v1;
+            Vector v2;
+            Color color;
+            //PointF v1p;
+            //PointF v2p;
+            public CarEdge(Vector Vertex1, Vector Vertex2, Color Color)
+            {
+                v1 = Vertex1;
+                v2 = Vertex2;
+                color = Color;
+                //v1p = null;
+                //v2p = null;
+            }
+
+
+
+            public Vector Vertex1
+            {
+                get { return v1; }
+            }
+            public Vector Vertex2
+            {
+                get { return v2; }
+            }
+            public Color Color
+            {
+                get { return color; }
+            }
+
+
+        }
+
         public class Building
         {
 
@@ -130,6 +164,8 @@ namespace _3D_Urban_Environment
                 get { return bheight; }
             }
         }
+
+
 
         public class Car
         {
@@ -203,6 +239,7 @@ namespace _3D_Urban_Environment
         Vector CartesianXAxis;
         Vector CartesianYAxis;
         System.Collections.ArrayList Edges;
+        System.Collections.ArrayList CarEdges;
         System.Collections.ArrayList Buildings;
         System.Collections.ArrayList Cars;
         System.Collections.ArrayList TempCars;
@@ -217,6 +254,7 @@ namespace _3D_Urban_Environment
             InitializeComponent();
 
             Edges = new System.Collections.ArrayList();
+            CarEdges = new System.Collections.ArrayList();
             Cars = new System.Collections.ArrayList();
             TempCars = new System.Collections.ArrayList();
             Buildings = new System.Collections.ArrayList();
@@ -497,6 +535,7 @@ namespace _3D_Urban_Environment
             double x = 100 * Math.Cos(a);
             double y = 100 * Math.Sin(a);
 
+            
             E = new Vector(x, y, 50);
             V = Add(new Vector(0, 0, 0), Scale(E, -1));
             V = Scale(V, ScaleValue);
@@ -596,13 +635,21 @@ namespace _3D_Urban_Environment
             Bitmap View = new Bitmap(pictureBox1.Width, pictureBox1.Height);
             Graphics g = Graphics.FromImage(View);
             g.FillRectangle(new SolidBrush(Color.Black), 0, 0, View.Width, View.Height);
-
+           
             // Draw buildings
             foreach (Edge edge in Edges)
             {
                 PointF V1 = Project(edge.Vertex1);
                 PointF V2 = Project(edge.Vertex2);
                 g.DrawLine(new Pen(edge.Color), V1.X, V1.Y, V2.X, V2.Y);
+            }
+
+            // Draw buildings
+            foreach (CarEdge caredge in CarEdges)
+            {
+                PointF V1 = Project(caredge.Vertex1);
+                PointF V2 = Project(caredge.Vertex2);
+                g.DrawLine(new Pen(caredge.Color), V1.X, V1.Y, V2.X, V2.Y);
             }
 
             // Display View
@@ -614,33 +661,36 @@ namespace _3D_Urban_Environment
         {
             foreach (Car car in Cars)
             {
-                TempCars.Add(new Car(car.CarX + .001F, car.CarY, car.Clength, car.Cwidth, car.Cheight, 1, Color.Blue));
+           
                 
                 
-                car.CarX += .01F;
+                
+
+                car.CarX += .05F;
                 listBox1.Items.Add(car.CarX);
+                CarEdges.Clear();
 
                 //// Car top
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY, car.Cheight), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX + car.Clength, car.CarY, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY, car.Cheight), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX + car.Clength, car.CarY, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
                 // Car base
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY, 0), new Vector(car.CarX + car.Clength, car.CarY, 0), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY, 0), new Vector(car.CarX, car.CarY + car.Cwidth, 0), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX + car.Clength, car.CarY, 0), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, 0), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY + car.Cwidth, 0), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY, 0), new Vector(car.CarX + car.Clength, car.CarY, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY, 0), new Vector(car.CarX, car.CarY + car.Cwidth, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX + car.Clength, car.CarY, 0), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY + car.Cwidth, 0), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, 0), car.Ccolor));
                 //// Car sides
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX, car.CarY, 0), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY + car.Cwidth, 0), new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX + car.Clength, car.CarY, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY, 0), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), new Vector(car.CarX, car.CarY + car.Cwidth, 0), car.Ccolor));
-                Edges.Add(new Edge(new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX, car.CarY, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY + car.Cwidth, 0), new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX + car.Clength, car.CarY, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), new Vector(car.CarX, car.CarY + car.Cwidth, 0), car.Ccolor));
+                CarEdges.Add(new CarEdge(new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY + car.Cwidth, 0), car.Ccolor));
 
                 //TempCars.Remove(car);
             }
 
-     
+
         }
 
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
