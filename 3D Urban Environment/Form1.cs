@@ -177,8 +177,9 @@ namespace _3D_Urban_Environment
             float cstarty;
             float cspeed;
             Color ccolor;
+            int direction;
 
-            public Car(float StartX, float StartY, float CLength, float CWidth, float CHeight, float CSpeed, Color CColor)
+            public Car(float StartX, float StartY, float CLength, float CWidth, float CHeight, float CSpeed, Color CColor, int Direction)
             {
                 cheight = CHeight;
                 clength = CLength;
@@ -226,6 +227,12 @@ namespace _3D_Urban_Environment
             public Color Ccolor
             {
                 get { return ccolor; }
+            }
+
+            public int CDir
+            {
+                get { return direction; }
+                set { direction = value; }
             }
         }
 
@@ -275,7 +282,7 @@ namespace _3D_Urban_Environment
             Buildings.Add(new Building(-4, 5, 1, 1, 10));
             Buildings.Add(new Building(2, 4, 2, 2, 4));
 
-            Cars.Add(new Car(5.5F, 5.5F, .5F, .5F, .5F, .5F, Color.Blue));
+            
 
             foreach (Building building in Buildings)
             {
@@ -535,6 +542,8 @@ namespace _3D_Urban_Environment
             double x = 100 * Math.Cos(a);
             double y = 100 * Math.Sin(a);
 
+      
+
             
             E = new Vector(x, y, 50);
             V = Add(new Vector(0, 0, 0), Scale(E, -1));
@@ -553,6 +562,27 @@ namespace _3D_Urban_Environment
 
             label2.Text = "Eye = " + E.ToString();
             label3.Text = "View = " + V.ToString();
+
+            int CarsOnMap = Cars.Count;
+            //listBox1.Items.Add(CarsOnMap);
+            Random r = new Random();
+
+            int[] directions = new int[4];
+            directions[0] = 8;
+            directions[1] = 4;
+            directions[2] = 6;
+            directions[2] = 2;
+
+            int direction = directions[r.Next(0, 3)];
+
+            float randx = r.Next(1, 8);
+            float randy = r.Next(1, 8);
+
+            if (CarsOnMap < 5)
+            {
+                Cars.Add(new Car(randx, randy, .5F, .5F, .5F, .05F, Color.Blue, direction));
+                listBox1.Items.Add("Randx: " + randx + " RandY: " + randy + " Direction: " + direction);
+            }
 
             drawCars();
             draw();
@@ -659,20 +689,21 @@ namespace _3D_Urban_Environment
 
         private void drawCars()
         {
-            foreach (Car car in Cars)
-            {
-           
-                
-                
-                
+            CarEdges.Clear();
 
+            foreach (Car car in Cars)
+            { 
+                //DEBUG listBox1.Items.Add(car.CarX);
                 
-                listBox1.Items.Add(car.CarX);
-                CarEdges.Clear();
+                
 
                 if (car.CarX < 9.7F && car.CarX > 0.3F && car.CarY < 9.7F && car.CarY > 0.3F)
                 {
-                    car.CarX += .05F;
+                    if (car.CDir == 2) { car.CarY -= car.Cspeed; }
+                    else if (car.CDir == 4) { car.CarX -= car.Cspeed; }
+                    else if (car.CDir == 6) { car.CarX += car.Cspeed; }
+                    else { car.CarY += car.Cspeed; }
+                    //car.CarX += car.Cspeed;
                     //// Car top
                     CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX + car.Clength, car.CarY, car.Cheight), car.Ccolor));
                     CarEdges.Add(new CarEdge(new Vector(car.CarX, car.CarY, car.Cheight), new Vector(car.CarX, car.CarY + car.Cwidth, car.Cheight), car.Ccolor));
@@ -695,7 +726,6 @@ namespace _3D_Urban_Environment
 
 
         }
-
         protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
         {
             //capture up arrow key
